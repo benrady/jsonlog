@@ -49,6 +49,9 @@ debug: jsonlog_dbg ## Build a debug binary
 
 release: jsonlog ## Build a release binary
 
+run: debug ## Compile and run a debug build
+	@build/jsonlog_dbg
+
 test: $(TEST_RESULTS) ## Compile and run the tests
 	@echo
 	@date
