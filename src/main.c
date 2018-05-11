@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include "jsonlog/writer.h"
+#include "jsonlog/server.h"
 
 int main() {
-  printf("Hello World\n");
+  fprintf(stderr, "Starting jsonlog...\n");
+  return start_server();
 }

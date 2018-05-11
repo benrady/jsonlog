@@ -1,2 +1,2 @@
 
-int write(const char* key, const char* message);
+int write_message(const char*, const char*);
