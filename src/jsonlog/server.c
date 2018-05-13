@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <arpa/inet.h>
+#include <stdbool.h>
 
 #include "server.h"
 #include "writer.h"
@@ -10,40 +11,40 @@
 
 int start_server(int port)
 {
-  struct sockaddr_in si_me, si_other;
+  struct sockaddr_in addr_interface, addr_sender;
 
-  socklen_t slen = sizeof(si_other);
+  socklen_t slen = sizeof(addr_sender);
   int recv_len;
   char buf[BUFLEN];
 
   int sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   if (-1 == sockfd) {
     perror("Could not create datagram socket");
-    return 1;
+    return 3;
   }
 
   // zero out the structure
-  memset((char *) &si_me, 0, sizeof(si_me));
+  memset((char *) &addr_interface, 0, sizeof(addr_interface));
 
-  si_me.sin_family = AF_INET;
-  si_me.sin_port = htons(port);
-  si_me.sin_addr.s_addr = htonl(INADDR_ANY);
+  addr_interface.sin_family = AF_INET;
+  addr_interface.sin_port = htons(port);
+  addr_interface.sin_addr.s_addr = htonl(INADDR_ANY);
 
-  if (bind(sockfd, (struct sockaddr*)&si_me, sizeof(si_me) ) == -1) {
+  if (bind(sockfd, (struct sockaddr*)&addr_interface, sizeof(addr_interface) ) == -1) {
     perror("Could not bind to socket");
-    return 1;
+    return 4;
   }
 
   fprintf(stderr, "Ready for data...\n");
 
-  while(1) {
-    recv_len = recvfrom(sockfd, buf, BUFLEN, 0, (struct sockaddr *) &si_other, &slen);
+  while(true) {
+    recv_len = recvfrom(sockfd, buf, BUFLEN, 0, (struct sockaddr *) &addr_sender, &slen);
     if (-1 == recv_len) {
       perror("Error reading socket");
       return 1;
     }
 
-    //printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
+    //printf("Received packet from %s:%d\n", inet_ntoa(addr_sender.sin_addr), ntohs(addr_sender.sin_port));
     write_message("default", buf);
   }
 
