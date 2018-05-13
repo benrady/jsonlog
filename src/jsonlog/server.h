@@ -1,2 +1,3 @@
 
-int start_server(void);
+#include <sys/socket.h>
+int start_server(int port);

@@ -2,7 +2,7 @@ CC:=gcc
 CFLAGS:=-Wall -std=gnu11 -Werror -I src
 DEBUG_FLAGS:=-g -O0
 RELEASE_FLAGS:=-O3
-TEST_FLAGS:=-l cmocka -Wl,--wrap=socket,--wrap=perror
+TEST_FLAGS:=-l cmocka -Wl,--wrap=socket,--wrap=perror,--wrap=exit
 SRC:=$(shell find src/jsonlog -name '*.c')
 MAIN_SRC:=src/main.c
 TEST_SRC:=$(shell find tests -name '*.c')
@@ -25,8 +25,8 @@ build:
 	@mkdir -p build/tests
 	@mkdir -p build/results
 
-build/tests/%: tests/jsonlog/%.c | build
-	@$(CC) -o $@ $< $(CFLAGS) $(TEST_FLAGS) 
+build/tests/%: tests/jsonlog/%.c $(OBJ) | build
+	@$(CC) -o $@ $< $(OBJ) $(CFLAGS) $(DEBUG_FLAGS) $(TEST_FLAGS) 
 
 build/results/%.txt: build/tests/% | build # Runs tests in parallel when using -j
 	-@$^ > $@ 2>&1
