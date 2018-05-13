@@ -2,7 +2,7 @@ CC:=gcc
 CFLAGS:=-Wall -std=gnu11 -Werror -I src
 DEBUG_FLAGS:=-g -O0
 RELEASE_FLAGS:=-O3
-TEST_FLAGS:=-l cmocka -Wl,--wrap=socket,--wrap=perror,--wrap=exit,-wrap=bind
+TEST_FLAGS:=-l cmocka -Wl,--wrap=socket,--wrap=perror,--wrap=exit,-wrap=bind,-wrap=recvfrom
 SRC:=$(shell find src/jsonlog -name '*.c')
 MAIN_SRC:=src/main.c
 TEST_SRC:=$(shell find tests -name '*.c')

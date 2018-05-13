@@ -7,14 +7,22 @@
 #include "server.h"
 #include "writer.h"
 
-#define BUFLEN 1024 * 64  //Max length of buffer
+int recv_json(int sockfd, char buf[], struct sockaddr *addr_sender) {
+  socklen_t slen = sizeof(struct sockaddr_in);
+  int recv_len = recvfrom(sockfd, buf, BUFLEN, 0, addr_sender, &slen);
+  if (-1 == recv_len) {
+    perror("Error reading socket");
+    return 5;
+  }
+
+  //printf("Received packet from %s:%d\n", inet_ntoa(addr_sender.sin_addr), ntohs(addr_sender.sin_port));
+  write_message("default", buf);
+  return 0;
+}
 
 int start_server(int port)
 {
   struct sockaddr_in addr_interface, addr_sender;
-
-  socklen_t slen = sizeof(addr_sender);
-  int recv_len;
   char buf[BUFLEN];
 
   int sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -35,18 +43,10 @@ int start_server(int port)
     return 4;
   }
 
-  fprintf(stderr, "Ready for data...\n");
-
-  while(true) {
-    recv_len = recvfrom(sockfd, buf, BUFLEN, 0, (struct sockaddr *) &addr_sender, &slen);
-    if (-1 == recv_len) {
-      perror("Error reading socket");
-      return 1;
-    }
-
-    //printf("Received packet from %s:%d\n", inet_ntoa(addr_sender.sin_addr), ntohs(addr_sender.sin_port));
-    write_message("default", buf);
-  }
-
-  return 0;
+  int retval;
+  do {
+    retval = recv_json(sockfd, buf, (struct sockaddr*)&addr_sender);
+  } while(retval == 0);
+  return retval;
 }
+
